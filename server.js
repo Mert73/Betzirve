@@ -545,3 +545,29 @@ app.get("/", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
     console.log("Kalıcı Veritabanlı BetZirve aktif: http://0.0.0.0:" + PORT);
 });
+
+// Giriş ve Kayıt API Rotaları
+app.post('/api/register', (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ success: false, message: 'Kullanıcı adı ve şifre gereklidir.' });
+    }
+    const db = loadDB();
+    if (!db.users) db.users = [];
+    if (db.users.find(u => u.username === username)) {
+        return res.status(400).json({ success: false, message: 'Bu kullanıcı adı zaten alınmış.' });
+    }
+    db.users.push({ username, password, balance: 1000 });
+    saveDB(db);
+    res.json({ success: true, message: 'Kayıt başarılı!' });
+});
+
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+    const db = loadDB();
+    const user = (db.users || []).find(u => u.username === username && u.password === password);
+    if (!user) {
+        return res.status(400).json({ success: false, message: 'Hatalı kullanıcı adı veya şifre.' });
+    }
+    res.json({ success: true, message: 'Giriş başarılı!', user: { username: user.username } });
+});
