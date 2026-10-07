@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesli Sohbet Odaları</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #121216; color: #fff; padding: 15px; }
+        h1 { font-size: 1.5rem; margin-bottom: 15px; color: #00ffcc; text-align: center; }
+        .room-card { background: #1e1e24; border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #2a2a35; cursor: pointer; transition: 0.2s; }
+        .room-card:hover { border-color: #00ffcc; }
+        .room-info h3 { font-size: 1.1rem; margin-bottom: 5px; }
+        .room-info p { font-size: 0.85rem; color: #aaa; }
+        .join-btn { background: #00ffcc; color: #121216; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🎤 Canlı Sohbet Odaları</h1>
+    <div id="room-list">
+        <div class="room-card" onclick="joinRoom('Müzik Keyfi & Sohbet')">
+            <div class="room-info">
+                <h3>🎧 Müzik Keyfi & Sohbet</h3>
+                <p>Sunucu: Ahmet • 👤 6/8 Kişi</p>
+            </div>
+            <button class="join-btn">Odaya Gir</button>
+        </div>
+        <div class="room-card" onclick="joinRoom('Gecenin Yıldızları')">
+            <div class="room-info">
+                <h3>✨ Gecenin Yıldızları</h3>
+                <p>Sunucu: Zeynep • 👤 4/8 Kişi</p>
+            </div>
+            <button class="join-btn">Odaya Gir</button>
+        </div>
+    </div>
+
+    <script>
+        function joinRoom(roomName) {
+            window.location.href = `/room.html?name=${encodeURIComponent(roomName)}`;
+        }
+    </script>
+</body>
+</html>
