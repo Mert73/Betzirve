@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetZirve - Cüzdan & Para Yatırma</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --accent: #22c55e; --text: #f8fafc; --muted: #94a3b8; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 450px; display: flex; flex-direction: column; gap: 20px; }
+        .card { background: var(--card); border: 1px solid #334155; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .btn { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
+        input, select { padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: var(--text); width: 100%; box-sizing: border-box; }
+        a { color: var(--accent); text-decoration: none; font-weight: bold; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2 style="margin:0;">💳 Finans & Cüzdan</h2>
+            <a href="/">← Ana Sayfa</a>
+        </div>
+
+        <div class="card" style="text-align: center; border-color: var(--accent);">
+            <span style="color:var(--muted); font-size:0.9em;">Mevcut Bakiyeniz</span>
+            <h1 id="wallet-balance" style="margin:5px 0 0 0; color:var(--accent);">$0.00</h1>
+        </div>
+
+        <div class="card">
+            <h3 style="margin:0; font-size:1.1em;">Para Yatırma (Yatırım)</h3>
+            <label style="font-size:0.85em; color:var(--muted);">Ödeme Yöntemi:</label>
+            <select id="payment-method">
+                <option value="havale">Banka Havale / EFT (IBAN)</option>
+                <option value="papara">Papara</option>
+                <option value="kredi-karti">Kredi / Banka Kartı</option>
+            </select>
+            <label style="font-size:0.85em; color:var(--muted);">Yatırılacak Tutar ($):</label>
+            <input type="number" id="deposit-amount" value="50" min="10">
+            <button class="btn" onclick="requestDeposit()">Yatırım Talebi Oluştur</button>
+            <p id="deposit-status" style="margin:0; font-size:0.9em; text-align:center; font-weight:bold;"></p>
+        </div>
+
+        <div class="card">
+            <h3 style="margin:0; font-size:1.1em;">Ödeme Bildirimi (IBAN)</h3>
+            <p style="margin:0; font-size:0.85em; color:var(--muted);">Şirket IBAN: <b>TR44 0006 2000 1234 5678 9012 34</b> (Ziraat Bankası)<br>Açıklama kodunu havale yaparken yazınız.</p>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const username = localStorage.getItem('yoho_username') || 'Birkut';
+
+        socket.emit('join-site', { username });
+
+        socket.on('wallet-update', (wallet) => {
+            document.getElementById('wallet-balance').innerText = `$${wallet.balanceUSD.toFixed(2)}`;
+        });
+
+        function requestDeposit() {
+            const amount = parseFloat(document.getElementById('deposit-amount').value);
+            const method = document.getElementById('payment-method').value;
+            
+            // Simüle edilmiş anlık bakiye yükleme (Canlı sistemde PayTR / Midas entegrasyonu olur)
+            socket.emit('simulate-deposit', { username, amount });
+        }
+
+        socket.on('deposit-result', (data) => {
+            const statusEl = document.getElementById('deposit-status');
+            statusEl.style.color = data.success ? 'var(--accent)' : '#ef4444';
+            statusEl.innerText = data.message;
+        });
+    </script>
+</body>
+</html>

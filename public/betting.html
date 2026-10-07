@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YoHo Bahis - Canlı Spor İddaası</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
+        .card { background: #1f1f1f; border: 1px solid #333; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .match-row { display: flex; justify-content: space-between; align-items: center; background: #2a2a2a; padding: 10px; border-radius: 8px; }
+        button { background: #374151; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        button.active { background: #fe2c55; }
+        input { padding: 10px; border-radius: 6px; border: 1px solid #333; background: #121212; color: #fff; width: 100%; box-sizing: border-box; }
+        .primary-btn { background: #fe2c55; width: 100%; padding: 12px; font-size: 1.1em; }
+        a { color: #fe2c55; text-decoration: none; font-weight: bold; }
+        .header { display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2 style="margin:0;">⚽ Canlı Bahis</h2>
+            <a href="/">← Ana Sayfa</a>
+        </div>
+
+        <div class="card" style="border-color: #00f2fe; text-align:center;">
+            <h3 id="balance-display" style="margin:0; color:#00f2fe;">Bakiyen: Yükleniyor...</h3>
+        </div>
+
+        <div class="card">
+            <h3 style="margin:0; font-size:1em; color:#9ca3af;">Günün Öne Çıkan Maçları</h3>
+            <div id="match-list" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+
+        <div class="card">
+            <h3 style="margin:0; font-size:1em;">Kupon Yatırımı</h3>
+            <p id="selected-bet-info" style="margin:0; font-size:0.9em; color:#f59e0b;">Lütfen yukarıdan bir oran seçin.</p>
+            <input type="number" id="stake-amount" value="10" placeholder="Yatırım Tutarı ($)">
+            <button class="primary-btn" onclick="submitCoupon()">Kuponu Onayla ve Oyna</button>
+            <p id="coupon-result" style="margin:0; font-weight:bold; text-align:center;"></p>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const username = localStorage.getItem('yoho_username') || 'Bahisci_' + Math.floor(Math.random()*1000);
+        localStorage.setItem('yoho_username', username);
+
+        socket.emit('join-site', { username });
+        socket.emit('get-matches');
+
+        socket.on('wallet-update', (wallet) => {
+            document.getElementById('balance-display').innerText = `Bakiyen: $${wallet.balanceUSD.toFixed(2)}`;
+        });
+
+        let selectedMatch = null;
+
+        socket.on('match-list', (matches) => {
+            const listEl = document.getElementById('match-list');
+            listEl.innerHTML = '';
+            matches.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'match-row';
+                div.innerHTML = `
+                    <div style="font-size:0.9em;">
+                        <span style="color:#9ca3af; font-size:0.8em; display:block;">${m.league}</span>
+                        <b>${m.home} vs ${m.away}</b>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button onclick="selectOdd(${m.id}, '1', ${m.odd1}, '${m.home} Kazanır')">1 (${m.odd1})</button>
+                        <button onclick="selectOdd(${m.id}, 'X', ${m.oddX}, 'Beraberlik')">X (${m.oddX})</button>
+                        <button onclick="selectOdd(${m.id}, '2', ${m.odd2}, '${m.away} Kazanır')">2 (${m.odd2})</button>
+                    </div>
+                `;
+                listEl.appendChild(div);
+            });
+        });
+
+        function selectOdd(matchId, choice, odds, description) {
+            selectedMatch = { matchId, choice, odds, description };
+            document.getElementById('selected-bet-info').innerText = `Seçim: ${description} (Oran: ${odds})`;
+        }
+
+        function submitCoupon() {
+            if (!selectedMatch) {
+                alert('Lütfen önce bir maç oranı seçin!');
+                return;
+            }
+            const stake = parseFloat(document.getElementById('stake-amount').value);
+            socket.emit('place-sports-bet', {
+                username,
+                matchId: selectedMatch.matchId,
+                choice: selectedMatch.choice,
+                odds: selectedMatch.odds,
+                stake
+            });
+        }
+
+        socket.on('bet-result', (data) => {
+            const resEl = document.getElementById('coupon-result');
+            resEl.style.color = data.success ? '#10b981' : '#fe2c55';
+            resEl.innerText = data.message;
+        });
+    </script>
+</body>
+</html>

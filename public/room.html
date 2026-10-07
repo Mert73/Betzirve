@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YoHo Zirve - Canlı Oda</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: #fff; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { padding: 12px; background: #1f1f1f; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; }
+        .container { display: flex; flex: 1; overflow: hidden; }
+        #sidebar { width: 300px; background: #1f1f1f; border-right: 1px solid #333; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .panel { background: #121212; padding: 10px; border-radius: 8px; border: 1px solid #333; display: flex; flex-direction: column; gap: 6px; font-size: 0.9em; }
+        .stage-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .seat { background: #262626; border: 2px dashed #fe2c55; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; font-size: 0.8em; }
+        .seat.occupied { background: rgba(254,44,85,0.2); border-style: solid; font-weight: bold; }
+        #chat-area { flex: 1; display: flex; flex-direction: column; background: #0b0b0b; }
+        #messages { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        .message { padding: 8px 12px; border-radius: 6px; max-width: 75%; word-break: break-word; }
+        .message.user { background: #fe2c55; align-self: flex-end; }
+        .message.other { background: #1f1f1f; align-self: flex-start; }
+        .message.system { background: transparent; color: #b0b0b0; align-self: center; font-size: 0.85em; text-align: center; }
+        .message.gift { background: linear-gradient(135deg, #f59e0b, #fe2c55); color: #fff; align-self: center; font-weight: bold; border-radius: 12px; padding: 12px 20px; }
+        .input-box { display: flex; flex-direction: column; background: #1f1f1f; border-top: 1px solid #333; padding: 10px; gap: 8px; }
+        .gift-bar { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0; }
+        .gift-btn { cursor: pointer; padding: 6px 12px; background: #262626; border: 1px solid #333; border-radius: 6px; white-space: nowrap; font-size: 0.85em; font-weight: bold; }
+        .input-row { display: flex; gap: 8px; }
+        input, button { padding: 10px; border-radius: 6px; border: 1px solid #333; background: #121212; color: #fff; }
+        input { flex: 1; }
+        button { background: #fe2c55; border: none; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header>
+        <span id="room-title" style="font-weight: bold;">Yayın Odası</span>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <span id="wallet-display" style="background: rgba(254,44,85,0.15); padding: 6px 10px; border-radius: 6px; border: 1px solid #fe2c55; font-size: 0.85em;">Yükleniyor...</span>
+            <a href="/" style="color: #fe2c55; text-decoration: none; font-weight: bold;">🚪 Odadan Ayrıl</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="sidebar">
+            <div class="panel">
+                <h4>🎙️ Yayın Koltukları</h4>
+                <div class="stage-grid" id="stage-seats">
+                    <div class="seat" id="seat-0" onclick="claimSeat(0)">Koltuk 1 (Boş)</div>
+                    <div class="seat" id="seat-1" onclick="claimSeat(1)">Koltuk 2 (Boş)</div>
+                    <div class="seat" id="seat-2" onclick="claimSeat(2)">Koltuk 3 (Boş)</div>
+                    <div class="seat" id="seat-3" onclick="claimSeat(3)">Koltuk 4 (Boş)</div>
+                </div>
+                <button id="voice-btn" onclick="toggleVoiceChat()" style="display:none; margin-top:5px;">Mikrofonu Aç</button>
+            </div>
+
+            <div class="panel">
+                <h4>🏆 En Çok Hediye Atanlar</h4>
+                <ol id="leaderboard-list" style="margin: 0; padding-left: 20px; font-size: 0.85em;"></ol>
+            </div>
+        </div>
+
+        <div id="chat-area">
+            <div id="messages"></div>
+            <div class="input-box">
+                <div class="gift-bar">
+                    <span class="gift-btn" onclick="sendGift('Gül', '🌹', 1, 10)">🌹 Gül ($1)</span>
+                    <span class="gift-btn" onclick="sendGift('Kalp', '💖', 5, 50)">💖 Kalp ($5)</span>
+                    <span class="gift-btn" onclick="sendGift('Yat', '🛥️', 25, 250)">🛥️ Yat ($25)</span>
+                    <span class="gift-btn" onclick="sendGift('Aslan', '🦁', 100, 1000)">🦁 Aslan ($100)</span>
+                </div>
+                <div class="input-row">
+                    <input type="text" id="msg-input" placeholder="Mesaj yaz..." onkeypress="handleKeyPress(event)">
+                    <button onclick="sendMessage()">Gönder</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="audio-container" style="display:none;"></div>
+
+    <script>
+        const socket = io();
+        const username = localStorage.getItem('yoho_username') || 'Misafir';
+        const room = localStorage.getItem('yoho_room') || 'Genel';
+        let mySeatIndex = null;
+        let localStream = null;
+        let peerConnections = {};
+        const iceServers = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+
+        document.getElementById('room-title').innerText = `Yayın: ${room}`;
+        socket.emit('join-room', { username, room });
+
+        function claimSeat(index) { socket.emit('take-seat', { room, seatIndex: index }); }
+
+        socket.on('update-seats', (seats) => {
+            mySeatIndex = null;
+            for (let i = 0; i < 4; i++) {
+                const seatEl = document.getElementById(`seat-${i}`);
+                if (seats[i]) {
+                    seatEl.className = 'seat occupied';
+                    seatEl.innerText = `Yayıncı ${i+1}`;
+                    if (seats[i] === socket.id) mySeatIndex = i;
+                } else {
+                    seatEl.className = 'seat';
+                    seatEl.innerText = `Koltuk ${i+1} (Boş)`;
+                }
+            }
+            document.getElementById('voice-btn').style.display = (mySeatIndex !== null) ? 'block' : 'none';
+        });
+
+        async function toggleVoiceChat() {
+            const btn = document.getElementById('voice-btn');
+            if (!localStream) {
+                try {
+                    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                    btn.innerText = 'Yayını Kapat';
+                    btn.style.background = '#333';
+                } catch (e) { alert('Mikrofon izni yok.'); }
+            } else {
+                localStream.getTracks().forEach(t => t.stop());
+                localStream = null;
+                btn.innerText = 'Mikrofonu Aç';
+                btn.style.background = '#fe2c55';
+            }
+        }
+
+        socket.on('wallet-update', (wallet) => {
+            document.getElementById('wallet-display').innerText = `Bakiye: $${wallet.balanceUSD.toFixed(2)} | 💎 ${wallet.diamonds}`;
+        });
+
+        socket.on('leaderboard-update', (ranked) => {
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = '';
+            ranked.forEach(r => {
+                const li = document.createElement('li');
+                li.innerText = `${r.username} ($${r.score.toFixed(1)})`;
+                list.appendChild(li);
+            });
+        });
+
+        function sendGift(giftName, giftIcon, giftCostUSD, giftDiamonds) {
+            socket.emit('send-gift', { room, sender: username, giftName, giftIcon, giftCostUSD, giftDiamonds });
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('msg-input');
+            if (!input.value.trim()) return;
+            socket.emit('chat-message', { room, username, text: input.value });
+            input.value = '';
+        }
+        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+
+        socket.on('message', (data) => {
+            const box = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `message ${data.isGift ? 'gift' : (data.system ? 'system' : (data.username === username ? 'user' : 'other'))}`;
+            div.innerText = data.text;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        });
+    </script>
+</body>
+</html>

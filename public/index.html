@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BetZirve - Canlı Bahis & Casino</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root { --bg: #0f172a; --card: #1e293b; --accent: #22c55e; --accent-hover: #16a34a; --text: #f8fafc; --muted: #94a3b8; --danger: #ef4444; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; }
+        header { background: #090d16; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.4em; font-weight: 900; color: var(--accent); text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        .user-panel { display: flex; align-items: center; gap: 15px; }
+        .balance-badge { background: #1e293b; border: 1px solid #334155; padding: 6px 12px; border-radius: 20px; font-weight: bold; color: var(--accent); font-size: 0.9em; }
+        .nav-tabs { display: flex; background: #131c31; padding: 10px 20px; gap: 10px; overflow-x: auto; border-bottom: 1px solid #334155; }
+        .tab-btn { background: var(--card); color: var(--text); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; text-decoration: none; }
+        .tab-btn.active { background: var(--accent); color: #000; }
+        .main-container { max-width: 1200px; margin: 20px auto; padding: 0 15px; display: grid; grid-template-columns: 1fr 320px; gap: 20px; }
+        @media(max-width: 900px) { .main-container { grid-template-columns: 1fr; } }
+        .section-title { font-size: 1.2em; font-weight: bold; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent); padding-left: 10px; }
+        .match-card { background: var(--card); border: 1px solid #334155; border-radius: 10px; padding: 15px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .match-header { font-size: 0.85em; color: var(--muted); display: flex; justify-content: space-between; }
+        .match-teams { font-weight: bold; font-size: 1.05em; }
+        .odds-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 5px; }
+        .odd-btn { background: #0f172a; border: 1px solid #334155; color: var(--text); padding: 10px; border-radius: 6px; text-align: center; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .odd-btn:hover { border-color: var(--accent); }
+        .odd-btn.selected { background: var(--accent); color: #000; border-color: var(--accent); }
+        .betslip { background: var(--card); border: 1px solid #334155; border-radius: 10px; padding: 20px; height: fit-content; position: sticky; top: 80px; }
+        .betslip h3 { margin-top: 0; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+        .stake-input { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; color: var(--text); border-radius: 6px; box-sizing: border-box; margin: 15px 0; font-size: 1em; text-align: right; font-weight: bold; }
+        .btn-primary { background: var(--accent); color: #000; border: none; width: 100%; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .banner { background: linear-gradient(135deg, #16a34a, #0d9488); border-radius: 12px; padding: 25px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="logo">⚡ BETZİRVE</a>
+        <div class="user-panel">
+            <div class="balance-badge" id="header-balance">Bakiyen: $50.00</div>
+            <a href="/wallet" style="color: var(--text); text-decoration: none; font-size: 0.9em; font-weight: bold;">💰 Cüzdan</a>
+        </div>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active">⚽ Canlı & Futbol</button>
+        <a href="/games" class="tab-btn" style="background:#1e293b;">🎰 Casino & Slotlar</a>
+        <a href="/games" class="tab-btn" style="background:#1e293b;">🚀 Crash Roket</a>
+        <a href="/wallet" class="tab-btn" style="background:#1e293b;">💳 Para Yatır / Çek</a>
+    </div>
+
+    <div class="main-container">
+        <!-- SOL TARAF: MAÇ BÜLTENİ -->
+        <div>
+            <div class="banner">
+                <div>
+                    <h2 style="margin:0 0 5px 0;">Günün Süper Oranları</h2>
+                    <p style="margin:0; font-size:0.9em; opacity:0.9;">Derbi maçlarında çevrimsiz bonuslar seni bekliyor!</p>
+                </div>
+                <a href="/games" style="background:#0f172a; color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold;">Şimdi Oyna</a>
+            </div>
+
+            <div class="section-title">
+                <span>Canlı Bahis Bülteni</span>
+                <span style="font-size:0.8em; color:var(--muted);">Güncellendi</span>
+            </div>
+
+            <div id="match-list">
+                <!-- Maçlar Socket ile buraya dolacak -->
+            </div>
+        </div>
+
+        <!-- SAĞ TARAF: KUPON SEPETİ -->
+        <div class="betslip">
+            <h3>Bahis Kuponu</h3>
+            <div id="slip-content" style="color: var(--muted); font-size: 0.9em; margin-bottom: 15px;">
+                Henüz bir maç seçmediniz. Oranlara tıklayarak kupon oluşturun.
+            </div>
+            <div id="active-slip-details" style="display:none;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span>Seçim:</span>
+                    <strong id="slip-match-name" style="color:var(--accent);"></strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                    <span>Oran:</span>
+                    <strong id="slip-odds-val"></strong>
+                </div>
+                <label style="font-size:0.85em; color:var(--muted);">Yatırım Tutarı ($):</label>
+                <input type="number" id="stake-amount" class="stake-input" value="10" min="1">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:0.95em;">
+                    <span>Olası Kazanç:</span>
+                    <strong id="potential-payout" style="color:var(--accent);">$0.00</strong>
+                </div>
+                <button class="btn-primary" onclick="submitBet()">KUPONU ONAYLA</button>
+            </div>
+            <p id="bet-result-msg" style="margin-top:15px; text-align:center; font-weight:bold;"></p>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        const username = localStorage.getItem('yoho_username') || 'Birkut_' + Math.floor(Math.random()*10000);
+        localStorage.setItem('yoho_username', username);
+
+        socket.emit('join-site', { username });
+
+        socket.on('wallet-update', (wallet) => {
+            document.getElementById('header-balance').innerText = `Bakiyen: $${wallet.balanceUSD.toFixed(2)}`;
+        });
+
+        socket.emit('get-matches');
+
+        let selectedBet = null;
+
+        socket.on('match-list', (matches) => {
+            const listEl = document.getElementById('match-list');
+            listEl.innerHTML = '';
+            matches.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'match-card';
+                div.innerHTML = `
+                    <div class="match-header">
+                        <span>${m.league}</span>
+                        <span style="color:var(--accent);">● CANLI</span>
+                    </div>
+                    <div class="match-teams">${m.home} vs ${m.away}</div>
+                    <div class="odds-grid">
+                        <button class="odd-btn" onclick="selectOdd(${m.id}, '${m.home}', 1, ${m.odd1}, this)">1: ${m.odd1}</button>
+                        <button class="odd-btn" onclick="selectOdd(${m.id}, 'Beraberlik', 'X', ${m.oddX}, this)">X: ${m.oddX}</button>
+                        <button class="odd-btn" onclick="selectOdd(${m.id}, '${m.away}', 2, ${m.odd2}, this)">2: ${m.odd2}</button>
+                    </div>
+                `;
+                listEl.appendChild(div);
+            });
+        });
+
+        function selectOdd(matchId, name, choice, odds, btnElement) {
+            document.querySelectorAll('.odd-btn').forEach(b => b.classList.remove('selected'));
+            btnElement.classList.add('selected');
+
+            selectedBet = { matchId, name, choice, odds };
+            
+            document.getElementById('slip-content').style.display = 'none';
+            document.getElementById('active-slip-details').style.display = 'block';
+            document.getElementById('slip-match-name').innerText = name;
+            document.getElementById('slip-odds-val').innerText = odds;
+            
+            calculatePayout();
+        }
+
+        document.getElementById('stake-amount').addEventListener('input', calculatePayout);
+
+        function calculatePayout() {
+            if (!selectedBet) return;
+            const stake = parseFloat(document.getElementById('stake-amount').value) || 0;
+            const payout = stake * selectedBet.odds;
+            document.getElementById('potential-payout').innerText = `$${payout.toFixed(2)}`;
+        }
+
+        function submitBet() {
+            if (!selectedBet) return;
+            const stake = parseFloat(document.getElementById('stake-amount').value);
+            socket.emit('place-sports-bet', {
+                username,
+                matchId: selectedBet.matchId,
+                choice: selectedBet.choice,
+                odds: selectedBet.odds,
+                stake
+            });
+        }
+
+        socket.on('bet-result', (data) => {
+            const msgEl = document.getElementById('bet-result-msg');
+            msgEl.style.color = data.success ? 'var(--accent)' : 'var(--danger)';
+            msgEl.innerText = data.message;
+        });
+    </script>
+</body>
+</html>

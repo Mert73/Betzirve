@@ -1,0 +1,74 @@
+{
+  "users": {
+    "Kd": {
+      "balanceUSD": 26,
+      "diamonds": 50,
+      "totalGifted": 0,
+      "totalEarned": 0
+    },
+    "Jn": {
+      "balanceUSD": 44,
+      "diamonds": 150,
+      "totalGifted": 25,
+      "totalEarned": 0
+    },
+    "H": {
+      "balanceUSD": 424125361228564,
+      "diamonds": 50,
+      "totalGifted": 25,
+      "totalEarned": 0
+    },
+    "Birkut_8467": {
+      "balanceUSD": 9970,
+      "diamonds": 200
+    },
+    "Birkut_5166": {
+      "balanceUSD": 50,
+      "diamonds": 200
+    },
+    "Birkut_4610": {
+      "balanceUSD": 50,
+      "diamonds": 200
+    },
+    "Birkut_7478": {
+      "balanceUSD": 50,
+      "diamonds": 200
+    },
+    "Birkut_4476": {
+      "balanceUSD": 40375,
+      "diamonds": 200
+    }
+  },
+  "messages": {
+    "Wallet": [
+      {
+        "system": true,
+        "text": "Kd yayına katıldı.",
+        "username": "Sistem",
+        "time": "6:57:36 PM"
+      }
+    ],
+    "Ana-Yayin": [
+      {
+        "system": true,
+        "text": "Jn yayına katıldı.",
+        "username": "Sistem",
+        "time": "6:57:47 PM"
+      },
+      {
+        "system": true,
+        "text": "🎁 Jn, 🛥️ Yat ($25) Gönderdi! 🚀",
+        "isGift": true,
+        "username": "Jn",
+        "time": "06:57 PM"
+      },
+      {
+        "system": true,
+        "text": "🎁 H, 🛥️ Yat ($25) Gönderdi! 🚀",
+        "isGift": true,
+        "username": "H",
+        "time": "07:02 PM"
+      }
+    ]
+  }
+}

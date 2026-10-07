@@ -1,0 +1,182 @@
+{
+  "users": {
+    "Kullanıcı_123": {
+      "username": "Kullanıcı_123",
+      "points": 10,
+      "badges": "Yeni Üye 🌟"
+    },
+    "Kullanıcı_917": {
+      "username": "Kullanıcı_917",
+      "points": 19,
+      "badges": "Kurucu Üye 🌟",
+      "avatar": "👤"
+    },
+    "Kullanıcı_86": {
+      "username": "Kullanıcı_86",
+      "points": 13,
+      "badges": "Kurucu Üye 🌟",
+      "avatar": "👤"
+    },
+    "Kullanıcı_866": {
+      "username": "Kullanıcı_866",
+      "points": 36,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_511": {
+      "username": "Kullanıcı_511",
+      "points": 42,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_677": {
+      "username": "Kullanıcı_677",
+      "points": 30,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_55": {
+      "username": "Kullanıcı_55",
+      "points": 21,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_37": {
+      "username": "Kullanıcı_37",
+      "points": 33,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_776": {
+      "username": "Kullanıcı_776",
+      "points": 18,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_741": {
+      "username": "Kullanıcı_741",
+      "points": 21,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_408": {
+      "username": "Kullanıcı_408",
+      "points": 27,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_138": {
+      "username": "Kullanıcı_138",
+      "points": 18,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_614": {
+      "username": "Kullanıcı_614",
+      "points": 18,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_53": {
+      "username": "Kullanıcı_53",
+      "points": 18,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_102": {
+      "username": "Kullanıcı_102",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_153": {
+      "username": "Kullanıcı_153",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_442": {
+      "username": "Kullanıcı_442",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_600": {
+      "username": "Kullanıcı_600",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_62": {
+      "username": "Kullanıcı_62",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_225": {
+      "username": "Kullanıcı_225",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_73": {
+      "username": "Kullanıcı_73",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_70": {
+      "username": "Kullanıcı_70",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_871": {
+      "username": "Kullanıcı_871",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_977": {
+      "username": "Kullanıcı_977",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_46": {
+      "username": "Kullanıcı_46",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_450": {
+      "username": "Kullanıcı_450",
+      "points": 15,
+      "badges": "AI Destekçisi 🤖",
+      "avatar": "🤖"
+    },
+    "Kullanıcı_389": {
+      "username": "Kullanıcı_389",
+      "points": 50,
+      "level": 1,
+      "badges": "🌟 Yeni Üye",
+      "avatar": "😎"
+    },
+    "Kullanıcı_722": {
+      "username": "Kullanıcı_722",
+      "points": 120,
+      "balance": 500,
+      "level": 1,
+      "badges": "🌟 Yeni Üye",
+      "avatar": "😎"
+    },
+    "Mert": {
+      "username": "Mert",
+      "points": 3820,
+      "balance": 2200,
+      "level": 1,
+      "badges": "🌟 Yeni Üye",
+      "avatar": "🦁"
+    }
+  }
+}
