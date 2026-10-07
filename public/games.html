@@ -3,60 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YoHo Zirve - Kazan & Eğlen Oyunları</title>
-    <script src="/socket.io/socket.io.js"></script>
+    <title>BetZirve - Canlı Bahis ve Maçlar</title>
     <style>
-        body { font-family: sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: #1f1f1f; border: 1px solid #333; border-radius: 12px; padding: 25px; width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; margin-top: 20px; text-align: center; }
-        button { background: #fe2c55; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1em; }
-        a { color: #fe2c55; text-decoration: none; font-weight: bold; }
-        .wheel-box { width: 150px; height: 150px; border: 5px dashed #00f2fe; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2em; animation: spin-slow 10s infinite linear; }
-        @keyframes spin-slow { 100% { transform: rotate(360deg); } }
+        body { font-family: Arial, sans-serif; background-color: #0f172a; color: #fff; margin: 0; padding: 0; }
+        header { background: #1e293b; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .logo { color: #22c55e; font-weight: bold; font-size: 20px; }
+        .balance { background: #334155; padding: 8px 15px; border-radius: 8px; color: #22c55e; font-weight: bold; }
+        .container { padding: 15px; }
+        .section-title { font-size: 18px; margin-bottom: 10px; color: #38bdf8; border-left: 4px solid #38bdf8; padding-left: 8px; }
+        .match-card { background: #1e293b; padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        .match-info { font-size: 14px; }
+        .match-teams { font-weight: bold; margin-bottom: 5px; }
+        .odds { display: flex; gap: 5px; }
+        .odd-btn { background: #334155; border: none; color: #fff; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .odd-btn:hover { background: #22c55e; color: #000; }
+        .support-btn { position: fixed; bottom: 20px; right: 20px; background: #22c55e; color: #000; padding: 12px 20px; border-radius: 30px; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; }
     </style>
 </head>
 <body>
-    <div style="width: 100%; max-width: 400px; display: flex; justify-content: space-between; align-items: center;">
-        <h2>🎮 Şans Oyunları Salonu</h2>
-        <a href="/">← Ana Sayfa</a>
+
+    <header>
+        <div class="logo">⚡ BETZİRVE</div>
+        <div class="balance" id="wallet-balance">Bakiyen: $50.00</div>
+    </header>
+
+    <div class="container">
+        <div class="section-title">Canlı Bahis Bülteni & Maçlar</div>
+        
+        <div class="match-card">
+            <div class="match-info">
+                <div class="match-teams">Galatasaray - Fenerbahçe</div>
+                <div style="color: #94a3b8; font-size: 12px;">Süper Lig • Canlı</div>
+            </div>
+            <div class="odds">
+                <button class="odd-btn" onclick="addCoupon('Galatasaray - Fenerbahçe (MS 1)', 1.80)">1: 1.80</button>
+                <button class="odd-btn" onclick="addCoupon('Galatasaray - Fenerbahçe (MS X)', 3.40)">0: 3.40</button>
+                <button class="odd-btn" onclick="addCoupon('Galatasaray - Fenerbahçe (MS 2)', 4.10)">2: 4.10</button>
+            </div>
+        </div>
+
+        <div class="match-card">
+            <div class="match-info">
+                <div class="match-teams">Real Madrid - Barcelona</div>
+                <div style="color: #94a3b8; font-size: 12px;">La Liga • Canlı</div>
+            </div>
+            <div class="odds">
+                <button class="odd-btn" onclick="addCoupon('Real Madrid - Barcelona (MS 1)', 2.10)">1: 2.10</button>
+                <button class="odd-btn" onclick="addCoupon('Real Madrid - Barcelona (MS X)', 3.20)">0: 3.20</button>
+                <button class="odd-btn" onclick="addCoupon('Real Madrid - Barcelona (MS 2)', 3.00)">2: 3.00</button>
+            </div>
+        </div>
+
+        <div class="match-card">
+            <div class="match-info">
+                <div class="match-teams">Amedspor - Iğdır FK</div>
+                <div style="color: #94a3b8; font-size: 12px;">1. Lig • Canlı</div>
+            </div>
+            <div class="odds">
+                <button class="odd-btn" onclick="addCoupon('Amedspor - Iğdır FK (MS 1)', 1.70)">1: 1.70</button>
+                <button class="odd-btn" onclick="addCoupon('Amedspor - Iğdır FK (MS X)', 3.50)">0: 3.50</button>
+                <button class="odd-btn" onclick="addCoupon('Amedspor - Iğdır FK (MS 2)', 4.50)">2: 4.50</button>
+            </div>
+        </div>
+
+        <div style="background: #1e293b; padding: 15px; border-radius: 10px; margin-top: 20px;">
+            <div style="font-weight: bold; margin-bottom: 8px;">Bahis Kuponu</div>
+            <div id="coupon-content" style="color: #94a3b8; font-size: 14px;">Henüz bir maç seçmediniz. Oranlara tıklayarak kupon oluşturun.</div>
+        </div>
     </div>
 
-    <div class="card">
-        <h3 style="margin:0; color:#00f2fe;" id="balance-display">Bakiyen: Yükleniyor...</h3>
-        <p style="color:#b0b0b0; font-size:0.9em;">Çarkı çevir, yatırdığın bakiyeyi 2x, 5x veya 10x katla!</p>
-        
-        <div class="wheel-box" id="wheel">🎯</div>
-        
-        <div style="display: flex; gap: 10px;">
-            <button onclick="playWheel(5)" style="flex:1; background:#10b981;">$5 Oyna</button>
-            <button onclick="playWheel(20)" style="flex:1; background:#f59e0b;">$20 Oyna</button>
-        </div>
-        <p id="game-result" style="font-weight: bold; margin: 0; min-height: 24px;"></p>
-    </div>
+    <button class="support-btn" onclick="alert('Canlı destek hattına bağlandınız. Müşteri temsilcimiz birazdan sizinle ilgilenecektir.')">💬 Canlı Destek</button>
 
     <script>
-        const socket = io();
-        const username = localStorage.getItem('yoho_username') || 'Misafir';
-
-        socket.emit('join-room', { username, room: 'Games' });
-
-        socket.on('wallet-update', (wallet) => {
-            document.getElementById('balance-display').innerText = `Bakiyen: $${wallet.balanceUSD.toFixed(2)}`;
-        });
-
-        function playWheel(betAmount) {
-            socket.emit('play-game-wheel', { username, betAmount });
+        function addCoupon(match, odd) {
+            document.getElementById('coupon-content').innerHTML = `<div style="color: #22c55e; font-weight: bold;">Seçilen Maç: ${match}</div><div>Oran: ${odd}</div>`;
         }
-
-        socket.on('game-result-response', (data) => {
-            const resEl = document.getElementById('game-result');
-            if (data.success) {
-                resEl.style.color = '#10b981';
-                resEl.innerText = `🎉 Tebrikler! $${data.winAmount} kazandın!`;
-            } else {
-                resEl.style.color = '#fe2c55';
-                resEl.innerText = `😢 Maalesef kaybettin: ${data.message}`;
-            }
-        });
     </script>
 </body>
 </html>
