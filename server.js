@@ -45,6 +45,15 @@ app.post('/api/login', (req, res) => {
     res.json({ success: true, message: 'Giriş başarılı!' });
 });
 
+app.get('/games', (req, res) => {
+    const gamesPath = path.join(__dirname, 'public', 'games.html');
+    if (fs.existsSync(gamesPath)) {
+        res.sendFile(gamesPath);
+    } else {
+        res.status(404).send('Games dosyası bulunamadı.');
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Sunucu ${PORT} portunda çalışıyor.`);
 });
