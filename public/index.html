@@ -61,16 +61,16 @@
         async function handleSubmit() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const name = document.getElementById('name'.value);
+            const name = document.getElementById('name').value;
             const errorBox = document.getElementById('error-box');
 
-            if (!email || !password || (isRegister && !document.getElementById('name').value)) {
+            if (!email || !password || (isRegister && !name)) {
                 errorBox.innerText = 'Lütfen tüm alanları doldurun!';
                 return;
             }
 
             const endpoint = isRegister ? '/api/register' : '/api/login';
-            const bodyData = isRegister ? { name: document.getElementById('name').value, email, password } : { email, password };
+            const bodyData = isRegister ? { name, email, password } : { email, password };
 
             try {
                 const res = await fetch(endpoint, {
