@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sesli Sohbet Odası</title>
+    <title>Canlı Sesli Sohbet Odası</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- Agora RTC SDK -->
+    <script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.17.0.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
         body { background: #0d0d11; color: #fff; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { padding: 15px; background: #16161f; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #252533; }
         header h2 { font-size: 1rem; color: #00ffcc; }
         .back-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+        .wallet-badge { background: #1e1e2b; padding: 5px 10px; border-radius: 12px; font-size: 0.8rem; color: #ffcc00; border: 1px solid #333; }
         
-        /* Koltuklar Alanı */
         .seats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; padding: 20px; justify-items: center; background: #121218; }
         .seat { width: 65px; height: 65px; background: #22222f; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; border: 2px dashed #444; font-size: 0.75rem; color: #aaa; cursor: pointer; }
         .seat.occupied { border: 2px solid #00ffcc; color: #fff; background: #1a2e2b; }
-        .seat img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; position: absolute; top: 0; left: 0; }
 
-        /* Sohbet Alanı */
         .chat-container { flex: 1; display: flex; flex-direction: column; padding: 10px; overflow: hidden; background: #0f0f14; }
         .chat-messages { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; }
         .message { background: #1a1a24; padding: 8px 12px; border-radius: 8px; max-width: 80%; word-break: break-word; }
         .message span { color: #00ffcc; font-weight: bold; margin-right: 5px; }
 
-        /* Alt Kontrol Paneli */
         .controls { padding: 15px; background: #16161f; display: flex; gap: 10px; align-items: center; border-top: 1px solid #252533; }
         .chat-input { flex: 1; background: #22222f; border: none; padding: 10px 15px; border-radius: 20px; color: #fff; outline: none; }
         .action-btn { background: #22222f; border: none; width: 40px; height: 40px; border-radius: 50%; color: #fff; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -32,15 +32,13 @@
 </head>
 <body>
     <header>
-        <button class="back-btn" onclick="window.location.href='/rooms.html'">⬅</button>
+        <button class="back-btn" onclick="leaveRoom()">⬅</button>
         <h2 id="room-title">Oda Yükleniyor...</h2>
-        <span>👤 2</span>
+        <div class="wallet-badge">💎 1000.00</div>
     </header>
 
-    <!-- 8 Kişilik Mikrofon Koltukları -->
     <div class="seats-grid" id="seats-container">
-        <!-- Koltuklar dinamik oluşturulabilir -->
-        <div class="seat occupied">1<br>Sen</div>
+        <div class="seat occupied" onclick="toggleAudioSeat()">1<br>Sen (Sesli)</div>
         <div class="seat">2<br>Boş</div>
         <div class="seat">3<br>Boş</div>
         <div class="seat">4<br>Boş</div>
@@ -52,7 +50,7 @@
 
     <div class="chat-container">
         <div class="chat-messages" id="chat-messages">
-            <div class="message"><span>Sistem:</span> Odaya hoş geldiniz! Konuşmak için mikrofona basabilirsiniz.</div>
+            <div class="message"><span>Sistem:</span> Gerçek ses altyapısı hazır. Mikrofona basarak konuşmaya başlayabilirsiniz!</div>
         </div>
     </div>
 
@@ -63,12 +61,47 @@
     </div>
 
     <script>
+        const socket = io();
         const urlParams = new URLSearchParams(window.location.search);
-        document.getElementById('room-title').innerText = urlParams.get('name') || 'Sesli Sohbet Odası';
+        const roomName = urlParams.get('name') || 'Genel Sohbet';
+        document.getElementById('room-title').innerText = roomName;
 
+        // Agora RTC İstemcisi Kurulumu
+        const APP_ID = "YOUR_AGORA_APP_ID"; // Buraya Agora Console'dan alınacak App ID yazılacak
+        const client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+        let localAudioTrack = null;
         let isMuted = false;
+
+        async function initVoiceChat() {
+            try {
+                // Rastgele bir kullanıcı ID'si oluşturulur
+                const uid = await client.join(APP_ID, roomName, null, null);
+                
+                // Yerel mikrofon track'i oluşturulur
+                localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+                await client.publish([localAudioTrack]);
+                console.log("Sesli yayına başarıyla bağlandı!");
+
+                // Odaya giren diğer kullanıcıların seslerini dinleme
+                client.on("user-published", async (user, mediaType) => {
+                    await client.subscribe(user, mediaType);
+                    if (mediaType === "audio") {
+                        user.audioTrack.play();
+                    }
+                });
+            } catch (error) {
+                console.error("Ses bağlantı hatası:", error);
+            }
+        }
+
+        socket.emit('join-room', roomName);
+        // Gerçek ses başlatmayı tetikle (Tarayıcı izinleri için kullanıcı etkileşimi gerekebilir)
+        initVoiceChat();
+
         function toggleMic() {
+            if (!localAudioTrack) return;
             isMuted = !isMuted;
+            localAudioTrack.setMuted(isMuted);
             const btn = document.getElementById('mic-toggle');
             btn.style.background = isMuted ? '#ff4d4d' : '#00ffcc';
             btn.innerText = isMuted ? '🔇' : '🎤';
@@ -78,19 +111,35 @@
             if (e.key === 'Enter') {
                 const input = document.getElementById('msg-input');
                 if (input.value.trim() !== '') {
-                    const chatBox = document.getElementById('chat-messages');
-                    chatBox.innerHTML += `<div class="message"><span>Siz:</span> ${input.value}</div>`;
+                    socket.emit('chat-message', { room: roomName, user: 'Kullanıcı', text: input.value });
                     input.value = '';
-                    chatBox.scrollTop = chatBox.scrollHeight;
                 }
             }
         }
 
         function sendGift() {
-            const chatBox = document.getElementById('chat-messages');
-            chatBox.innerHTML += `<div class="message" style="color: #ffcc00;">🎁 Ahmet kullanıcısına Gül hediyesi gönderildi!</div>`;
-            chatBox.scrollTop = chatBox.scrollHeight;
+            socket.emit('send-gift', { room: roomName, user: 'Kullanıcı', gift: 'Altın Taç' });
         }
+
+        async function leaveRoom() {
+            if (localAudioTrack) {
+                localAudioTrack.close();
+            }
+            await client.leave();
+            window.location.href = '/rooms';
+        }
+
+        socket.on('chat-message', (data) => {
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.innerHTML += `<div class="message"><span>${data.user}:</span> ${data.text}</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        socket.on('send-gift', (data) => {
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.innerHTML += `<div class="message" style="color: #ffcc00;">🎁 ${data.user} bir adet ${data.gift} hediyesi gönderdi!</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
     </script>
 </body>
 </html>
