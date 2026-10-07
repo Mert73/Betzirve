@@ -4,32 +4,24 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Basit kullanıcı veritabanı simülasyonu (Bellekte tutulur)
-let users = {
-    "demo@betzirve.com": { password: "123", balance: 1000.00, username: "Yaşar" }
-};
+// Kullanıcı veritabanı simülasyonu
+const users = {};
 
-// Giriş endpoint'i
 app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-    if (users[email] && users[email].password === password) {
-        res.json({ success: true, user: users[email] });
-    } else {
-        // Otomatik kayıt / misafir girişi desteği
-        if (!users[email]) {
-            users[email] = { password: password || "123", balance: 1000.00, username: email.split('@')[0] };
-            return res.json({ success: true, user: users[email] });
-        }
-        res.status(401).json({ success: false, message: "Hatalı şifre!" });
+    const { email } = req.body;
+    if (!email) {
+        return res.json({ success: false, message: 'E-posta gerekli!' });
     }
+    if (!users[email]) {
+        users[email] = { email, balance: 1000.00 };
+    }
+    res.json({ success: true, user: users[email] });
 });
 
-// Bakiye sorgulama
 app.get('/api/wallet', (req, res) => {
-    const email = req.query.email || "demo@betzirve.com";
+    const { email } = req.query;
     if (users[email]) {
         res.json({ balance: users[email].balance });
     } else {
@@ -37,6 +29,15 @@ app.get('/api/wallet', (req, res) => {
     }
 });
 
+// Doğrudan /games sayfasına gelen istekler için games.html sunumu
+app.get('/games', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'games.html'));
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'games.html'));
+});
+
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
