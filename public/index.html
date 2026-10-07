@@ -3,86 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BetZirve - Canlı Bahis ve Casino</title>
+    <title>Giriş Yap / Kayıt Ol</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #0f172a; color: #fff; margin: 0; padding: 0; }
-        header { background: #1e293b; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-        .logo { color: #22c55e; font-weight: bold; font-size: 20px; }
-        .balance { background: #334155; padding: 8px 15px; border-radius: 8px; color: #22c55e; font-weight: bold; }
-        .container { padding: 15px; }
-        .section-title { font-size: 18px; margin-bottom: 10px; color: #38bdf8; border-left: 4px solid #38bdf8; padding-left: 8px; }
-        .match-card { background: #1e293b; padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
-        .match-info { font-size: 14px; }
-        .match-teams { font-weight: bold; margin-bottom: 5px; }
-        .odds { display: flex; gap: 5px; }
-        .odd-btn { background: #334155; border: none; color: #fff; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .odd-btn:hover { background: #22c55e; color: #000; }
-        .support-btn { position: fixed; bottom: 20px; right: 20px; background: #22c55e; color: #000; padding: 12px 20px; border-radius: 30px; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 1000; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #121216; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; padding: 15px; }
+        .auth-card { background: #1e1e24; padding: 25px; border-radius: 16px; width: 100%; max-width: 380px; border: 1px solid #2a2a35; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #00ffcc; margin-bottom: 20px; font-size: 1.5rem; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 12px; background: #2a2a35; border: 1px solid #444; border-radius: 8px; color: #fff; outline: none; font-size: 0.95rem; }
+        .input-group input:focus { border-color: #00ffcc; }
+        .auth-btn { width: 100%; background: #00ffcc; color: #121216; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 10px; }
+        .switch-text { text-align: center; margin-top: 15px; font-size: 0.85rem; color: #aaa; }
+        .switch-text span { color: #00ffcc; cursor: pointer; font-weight: bold; }
+        .error-msg { color: #ff4d4d; font-size: 0.85rem; text-align: center; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-
-    <header>
-        <div class="logo">⚡ BETZİRVE</div>
-        <div class="balance" id="wallet-balance">Bakiyen: Yükleniyor...</div>
-    </header>
-
-    <div class="container">
-        <div class="section-title">Canlı Bahis Bülteni & Maçlar</div>
+    <div class="auth-card">
+        <h2 id="form-title">Giriş Yap</h2>
+        <div id="error-box" class="error-msg"></div>
         
-        <div class="match-card">
-            <div class="match-info">
-                <div class="match-teams">Galatasaray - Fenerbahçe</div>
-                <div style="color: #94a3b8; font-size: 12px;">Süper Lig • Canlı</div>
-            </div>
-            <div class="odds">
-                <button class="odd-btn" onclick="addCoupon('Galatasaray - Fenerbahçe (MS 1)', 1.80)">1: 1.80</button>
-                <button class="odd-btn" onclick="addCoupon('Galatasaray - Fenerbahçe (MS X)', 3.40)">0: 3.40</button>
-                <button class="odd-btn" onclick="addCoupon('Galatasaray - Fenerbahçe (MS 2)', 4.10)">2: 4.10</button>
-            </div>
+        <div class="input-group" id="name-group" style="display: none;">
+            <label>Adınız</label>
+            <input type="text" id="name" placeholder="Adınızı girin">
+        </div>
+        <div class="input-group">
+            <label>E-posta Adresi</label>
+            <input type="email" id="email" placeholder="ornek@mail.com">
+        </div>
+        <div class="input-group">
+            <label>Şifre</label>
+            <input type="password" id="password" placeholder="******">
         </div>
 
-        <div class="match-card">
-            <div class="match-info">
-                <div class="match-teams">Real Madrid - Barcelona</div>
-                <div style="color: #94a3b8; font-size: 12px;">La Liga • Canlı</div>
-            </div>
-            <div class="odds">
-                <button class="odd-btn" onclick="addCoupon('Real Madrid - Barcelona (MS 1)', 2.10)">1: 2.10</button>
-                <button class="odd-btn" onclick="addCoupon('Real Madrid - Barcelona (MS X)', 3.20)">0: 3.20</button>
-                <button class="odd-btn" onclick="addCoupon('Real Madrid - Barcelona (MS 2)', 3.00)">2: 3.00</button>
-            </div>
-        </div>
-
-        <div class="match-card">
-            <div class="match-info">
-                <div class="match-teams">Amedspor - ığdır FK</div>
-                <div style="color: #94a3b8; font-size: 12px;">1. Lig • Canlı</div>
-            </div>
-            <div class="odds">
-                <button class="odd-btn" onclick="addCoupon('Amedspor - Iğdır FK (MS 1)', 1.70)">1: 1.70</button>
-                <button class="odd-btn" onclick="addCoupon('Amedspor - Iğdır FK (MS X)', 3.50)">0: 3.50</button>
-                <button class="odd-btn" onclick="addCoupon('Amedspor - Iğdır FK (MS 2)', 4.50)">2: 4.50</button>
-            </div>
-        </div>
-
-        <div style="background: #1e293b; padding: 15px; border-radius: 10px; margin-top: 20px;">
-            <div style="font-weight: bold; margin-bottom: 8px;">Bahis Kuponu</div>
-            <div id="coupon-content" style="color: #94a3b8; font-size: 14px;">Henüz bir maç seçmediniz. Oranlara tıklayarak kupon oluşturun.</div>
+        <button class="auth-btn" id="submit-btn" onclick="handleSubmit()">Giriş Yap</button>
+        
+        <div class="switch-text" id="switch-text">
+            Hesabın yok mu? <span onclick="toggleMode()">Kayıt Ol</span>
         </div>
     </div>
 
-    <button class="support-btn" onclick="alert('Canlı destek hattına bağlandınız. Müşteri temsilcimiz birazdan sizinle ilgilenecektir.')">💬 Canlı Destek</button>
-
     <script>
-        fetch('/api/wallet')
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById('wallet-balance').innerText = 'Bakiyen: $' + data.balance.toFixed(2);
-            });
+        let isRegister = false;
 
-        function addCoupon(match, odd) {
-            document.getElementById('coupon-content').innerHTML = `<div style="color: #22c55e; font-weight: bold;">Seçilen Maç: ${match}</div><div>Oran: ${odd}</div>`;
+        function toggleMode() {
+            isRegister = !isRegister;
+            document.getElementById('form-title').innerText = isRegister ? 'Kayıt Ol' : 'Giriş Yap';
+            document.getElementById('submit-btn').innerText = isRegister ? 'Kayıt Ol' : 'Giriş Yap';
+            document.getElementById('name-group').style.display = isRegister ? 'block' : 'none';
+            document.getElementById('switch-text').innerHTML = isRegister ? 
+                'Zaten hesabın var mı? <span onclick="toggleMode()">Giriş Yap</span>' : 
+                'Hesabın yok mu? <span onclick="toggleMode()">Kayıt Ol</span>';
+            document.getElementById('error-box').innerText = '';
+        }
+
+        async function handleSubmit() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const name = document.getElementById('name'.value);
+            const errorBox = document.getElementById('error-box');
+
+            if (!email || !password || (isRegister && !document.getElementById('name').value)) {
+                errorBox.innerText = 'Lütfen tüm alanları doldurun!';
+                return;
+            }
+
+            const endpoint = isRegister ? '/api/register' : '/api/login';
+            const bodyData = isRegister ? { name: document.getElementById('name').value, email, password } : { email, password };
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyData)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    localStorage.setItem('currentUser', JSON.stringify(data.user));
+                    window.location.href = '/rooms';
+                } else {
+                    errorBox.innerText = data.message;
+                }
+            } catch (err) {
+                errorBox.innerText = 'Bir hata oluştu, tekrar deneyin.';
+            }
         }
     </script>
 </body>

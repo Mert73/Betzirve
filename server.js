@@ -78,7 +78,7 @@ io.on('connection', (socket) => {
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
 app.get('/rooms', (req, res) => res.sendFile(path.join(__dirname, 'public', 'rooms.html')));
 app.get('/room', (req, res) => res.sendFile(path.join(__dirname, 'public', 'room.html')));
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
